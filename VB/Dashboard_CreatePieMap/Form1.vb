@@ -5,49 +5,44 @@ Imports DevExpress.DataAccess.Sql
 Imports DevExpress.XtraEditors
 
 Namespace Dashboard_CreatePieMap
-    Partial Public Class Form1
-        Inherits XtraForm
+	Partial Public Class Form1
+		Inherits XtraForm
 
-        Public Sub New()
-            InitializeComponent()
-        End Sub
+		Public Sub New()
+			InitializeComponent()
+		End Sub
 
-        Private Sub Form1_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
-            ' Creates a new dashboard and data source for this dashboard.
-            Dim dashboard As New Dashboard()
+		Private Sub Form1_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+			Dim dashboard As New Dashboard()
 
-            Dim xmlDataSource As New DashboardSqlDataSource()
-            xmlDataSource.ConnectionParameters =
-                New XmlFileConnectionParameters("..\..\Data\DashboardEnergyStatictics.xml")
-            Dim sqlQuery As SelectQuery = SelectQueryFluentBuilder.AddTable("Countries"). _
-                SelectColumns("Latitude", "Longitude", "Production", "EnergyType", "Country").Build("Query 1")
-            xmlDataSource.Queries.Add(sqlQuery)
-            dashboard.DataSources.Add(xmlDataSource)
+			Dim xmlDataSource As New DashboardSqlDataSource()
+			xmlDataSource.ConnectionParameters = New XmlFileConnectionParameters("..\..\Data\DashboardEnergyStatictics.xml")
+			Dim sqlQuery As SelectQuery = SelectQueryFluentBuilder.AddTable("Countries").SelectColumns("Latitude", "Longitude", "Production", "EnergyType", "Country").Build("Query 1")
+			xmlDataSource.Queries.Add(sqlQuery)
+			dashboard.DataSources.Add(xmlDataSource)
 
-            ' Creates a Pie Map dashboard item and specifies its data source.
-            Dim pieMap As New PieMapDashboardItem()
-            pieMap.DataSource = xmlDataSource
-            pieMap.DataMember = "Query 1"
+			Dim pieMap As PieMapDashboardItem = CreatePieMap(xmlDataSource)
 
-            ' Loads the map of the europe.
-            pieMap.Area = ShapefileArea.Europe
+			dashboard.Items.Add(pieMap)
+			dashboardViewer1.Dashboard = dashboard
+		End Sub
 
-            ' Provides countries coordinates.
-            pieMap.Latitude = New Dimension("Latitude")
-            pieMap.Longitude = New Dimension("Longitude")
+		Private Shared Function CreatePieMap(ByVal xmlDataSource As DashboardSqlDataSource) As PieMapDashboardItem
+			Dim pieMap As New PieMapDashboardItem()
+			pieMap.DataSource = xmlDataSource
+			pieMap.DataMember = "Query 1"
 
-            ' Specifies pie values and argument.
-            pieMap.Values.Add(New Measure("Production"))
-            pieMap.Argument = New Dimension("EnergyType")
+			pieMap.Area = ShapefileArea.Europe
 
-            ' Specifies values displayed within pie tooltips.
-            pieMap.TooltipDimensions.Add(New Dimension("Country"))
-            pieMap.Legend.Visible = True
+			pieMap.Latitude = New Dimension("Latitude")
+			pieMap.Longitude = New Dimension("Longitude")
 
-            ' Adds the Pie Map dashboard item to the dashboard and opens this
-            ' dashboard in the Dashboard Viewer.
-            dashboard.Items.Add(pieMap)
-            dashboardViewer1.Dashboard = dashboard
-        End Sub
-    End Class
+			pieMap.Values.Add(New Measure("Production"))
+			pieMap.Argument = New Dimension("EnergyType")
+
+			pieMap.TooltipDimensions.Add(New Dimension("Country"))
+			pieMap.Legend.Visible = True
+			Return pieMap
+		End Function
+	End Class
 End Namespace

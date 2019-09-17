@@ -8,10 +8,11 @@ namespace Dashboard_CreatePieMap {
     public partial class Form1 : XtraForm {
         public Form1() {
             InitializeComponent();
+            dashboardViewer1.AsyncMode = true;
         }
 
-        private void Form1_Load(object sender, EventArgs e) {
-            // Creates a new dashboard and data source for this dashboard.
+        private void Form1_Load(object sender, EventArgs e)
+        {
             Dashboard dashboard = new Dashboard();
 
             DashboardSqlDataSource xmlDataSource = new DashboardSqlDataSource();
@@ -24,30 +25,29 @@ namespace Dashboard_CreatePieMap {
             xmlDataSource.Queries.Add(sqlQuery);
             dashboard.DataSources.Add(xmlDataSource);
 
-            // Creates a Pie Map dashboard item and specifies its data source.
+            PieMapDashboardItem pieMap = CreatePieMap(xmlDataSource);
+
+            dashboard.Items.Add(pieMap);
+            dashboardViewer1.Dashboard = dashboard;
+        }
+
+        private static PieMapDashboardItem CreatePieMap(DashboardSqlDataSource xmlDataSource)
+        {
             PieMapDashboardItem pieMap = new PieMapDashboardItem();
             pieMap.DataSource = xmlDataSource;
             pieMap.DataMember = "Query 1";
 
-            // Loads the map of the europe.
             pieMap.Area = ShapefileArea.Europe;
 
-            // Provides countries coordinates.
             pieMap.Latitude = new Dimension("Latitude");
             pieMap.Longitude = new Dimension("Longitude");
 
-            // Specifies pie values and argument.
             pieMap.Values.Add(new Measure("Production"));
             pieMap.Argument = new Dimension("EnergyType");
 
-            // Specifies values displayed within pie tooltips.
             pieMap.TooltipDimensions.Add(new Dimension("Country"));
             pieMap.Legend.Visible = true;
-
-            // Adds the Pie Map dashboard item to the dashboard and opens this
-            // dashboard in the Dashboard Viewer.
-            dashboard.Items.Add(pieMap);
-            dashboardViewer1.Dashboard = dashboard;
+            return pieMap;
         }
     }
 }
