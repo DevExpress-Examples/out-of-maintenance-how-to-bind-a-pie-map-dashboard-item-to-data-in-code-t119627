@@ -8,7 +8,6 @@ namespace Dashboard_CreatePieMap {
     public partial class Form1 : XtraForm {
         public Form1() {
             InitializeComponent();
-            dashboardViewer1.AsyncMode = true;
         }
 
         private void Form1_Load(object sender, EventArgs e)
